@@ -1,0 +1,36 @@
+# Cloud Build 설정 파일 (Cloud Run 배포용)
+steps:
+  # Docker 이미지 빌드
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/youtube-to-gcs:$SHORT_SHA', '.']
+  
+  # 이미지 푸시
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/youtube-to-gcs:$SHORT_SHA']
+  
+  # Cloud Run에 배포
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'youtube-to-gcs'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/youtube-to-gcs:$SHORT_SHA'
+      - '--region'
+      - 'asia-northeast3'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GOOGLE_CLOUD_PROJECT_ID=my-app-dev-482411,GCS_BUCKET_NAME=sj-app-storage'
+      - '--set-secrets'
+      - 'YOUTUBE_API_KEY=YOUTUBE_API_KEY:latest'
+
+images:
+  - 'gcr.io/$PROJECT_ID/youtube-to-gcs:$SHORT_SHA'
+
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+

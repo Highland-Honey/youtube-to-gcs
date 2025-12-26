@@ -1,0 +1,16 @@
+runtime: nodejs20
+
+env: standard
+
+instance_class: F1
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.6
+
+env_variables:
+  GOOGLE_CLOUD_PROJECT_ID: 'my-app-dev-482411'
+  GCS_BUCKET_NAME: 'sj-app-storage'
+  # YOUTUBE_API_KEY는 GCP Secret Manager 또는 환경 변수로 설정 필요
+
